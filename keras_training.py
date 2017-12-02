@@ -1,3 +1,8 @@
+"""keras_training.py: purpose of this script is to train deep neural network using keras on  Toronto emotion speech
+dataset to predict the emotion from speech """
+
+__author__ = "Dhaval Thakkar"
+
 import glob
 import librosa
 import librosa.display

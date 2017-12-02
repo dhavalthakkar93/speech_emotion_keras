@@ -1,3 +1,8 @@
+"""keras_evolution.py: purpose of this script is to predict the emotion from the speech using trained
+deep neural network based Toronto emotion speech dataset """
+
+__author__ = "Dhaval Thakkar"
+
 import glob
 import librosa
 import librosa.display
