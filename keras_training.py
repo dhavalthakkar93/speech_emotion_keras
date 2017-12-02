@@ -78,7 +78,7 @@ def baseline_model():
     return deep_model
 
 
-epoches = 1000
+epoches = 2000
 batch_size = 25
 verbose = 1
 
@@ -102,7 +102,6 @@ plt.ylabel('accuracy')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper left')
 plt.show()
-plt.savefig('accuracy.png')
 
 plt.plot(result.history['loss'])
 plt.plot(result.history['val_loss'])
@@ -111,4 +110,4 @@ plt.ylabel('loss')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper left')
 plt.show()
-plt.savefig('loss.png')
+
