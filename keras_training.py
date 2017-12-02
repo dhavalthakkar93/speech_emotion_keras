@@ -11,12 +11,11 @@ import pandas as pd
 import numpy
 from keras.models import Sequential
 from keras.layers import Dense
-from keras.wrappers.scikit_learn import KerasClassifier
 from keras.utils import np_utils
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import KFold
 from sklearn.preprocessing import LabelEncoder
 from keras.layers import Dropout
+from matplotlib import pyplot as plt
+
 
 def extract_feature(file_name):
     X, sample_rate = librosa.load(file_name)
@@ -54,6 +53,7 @@ tr_labels = np.array(tr_labels, dtype=pd.Series)
 
 X = tr_features.astype(int)
 Y = tr_labels.astype(str)
+
 seed = 7
 numpy.random.seed(seed)
 
@@ -65,30 +65,29 @@ dummy_y = np_utils.to_categorical(encoded_Y)
 
 
 def baseline_model():
-    model = Sequential()
-    """model.add(Dense(8, input_dim=193, activation='relu'))
-    model.add(Dense(7, activation='softmax'))"""
-    model.add(Dense(8, input_dim=193, activation="relu", kernel_initializer="uniform"))
-    model.add(Dropout(0.5))
-    model.add(Dense(7, activation="relu", kernel_initializer="uniform"))
-    model.add(Dropout(0.5))
-    model.add(Dense(7, activation="softmax", kernel_initializer="uniform"))
+    deep_model = Sequential()
+    deep_model.add(Dense(8, input_dim=193, activation="relu", kernel_initializer="uniform"))
+    deep_model.add(Dropout(0.5))
+    deep_model.add(Dense(7, activation="relu", kernel_initializer="uniform"))
+    deep_model.add(Dropout(0.5))
+    deep_model.add(Dense(7, activation="relu", kernel_initializer="uniform"))
+    deep_model.add(Dropout(0.5))
+    deep_model.add(Dense(7, activation="softmax", kernel_initializer="uniform"))
 
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    return model
+    deep_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    return deep_model
 
 
-epoches = 500
-batch_size = 5
+epoches = 1000
+batch_size = 25
 verbose = 1
 
-estimator = KerasClassifier(build_fn=baseline_model, epochs=epoches, batch_size=batch_size, verbose=verbose)
-kfold = KFold(n_splits=10, shuffle=True, random_state=seed)
-results = cross_val_score(estimator, X, dummy_y, cv=kfold)
 model = baseline_model()
-model.fit(X, dummy_y, batch_size=batch_size, epochs=epoches, verbose=verbose)
+result = model.fit(X, dummy_y, validation_split=0.1, batch_size=batch_size, epochs=epoches, verbose=verbose)
 
-print("Baseline: %.2f%% (%.2f%%)" % (results.mean() * 100, results.std() * 100))
+# print("Baseline: %.2f%% (%.2f%%)" % (results.mean() * 100, results.std() * 100))
+
+print(result.history)
 
 filename = 'keras_model.h5'
 
@@ -96,3 +95,20 @@ model.save(filename)
 
 print('Model Saved..')
 
+plt.plot(result.history['acc'])
+plt.plot(result.history['val_acc'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
+plt.savefig('accuracy.png')
+
+plt.plot(result.history['loss'])
+plt.plot(result.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
+plt.savefig('loss.png')
